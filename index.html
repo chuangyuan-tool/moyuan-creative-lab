@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>墨渊·创世工坊 v8.0 · 全栈版</title>
+  <title>墨渊·创世工坊 v8.0 · 全栈版</title>
   <style>
     :root {
       --bg: #0a0e17; --sidebar: #101524; --card: #1a1f32; --border: #2a3145;
@@ -17,11 +17,36 @@
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg); color:var(--text); transition:0.3s; }
+
+    /* 布局基础：电脑+手机自适应 */
     .app { display:flex; height:100vh; overflow:hidden; }
     .sidebar {
       width:260px; background:var(--sidebar); display:flex; flex-direction:column;
       border-right:1px solid var(--border); z-index:10; position:relative;
     }
+    .main { flex:1; display:flex; flex-direction:column; min-width:0; }
+    .topbar { background:var(--sidebar); padding:8px 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+    .right-actions { margin-left:auto; display:flex; gap:8px; align-items:center; }
+    .content { flex:1; overflow-y:auto; padding:20px; }
+    .right-panel { width:280px; background:var(--sidebar); padding:16px; border-left:1px solid var(--border); overflow-y:auto; }
+
+    /* 手机自适应核心 */
+    @media (max-width:900px) {
+      .app { flex-direction:column; height:auto; min-height:100vh; }
+      .sidebar { width:100%; height:auto; border-right:none; border-bottom:1px solid var(--border); }
+      .right-panel { width:100%; border-left:none; border-top:1px solid var(--border); }
+      .hero h1 { font-size:32px !important; }
+      .slogan-item { font-size:20px !important; }
+      .scene-grid { grid-template-columns:1fr 1fr !important; }
+      .cta-btn { padding:14px 30px !important; font-size:18px !important; }
+    }
+    @media (max-width:600px) {
+      .scene-grid { grid-template-columns:1fr !important; }
+      .topbar { padding:10px; }
+      .content { padding:12px; }
+    }
+
+    /* 通用样式 */
     .logo { padding:22px 20px 10px; font-size:19px; font-weight:bold; color:var(--accent); cursor:pointer; }
     nav { flex:1; overflow-y:auto; padding:6px 0; }
     nav a { display:flex; align-items:center; gap:9px; padding:10px 20px; color:var(--text2); text-decoration:none; font-size:14px; transition:0.2s; }
@@ -30,13 +55,10 @@
     .bottom-group a { display:block; padding:8px 20px; color:var(--text2); text-decoration:none; font-size:13px; }
     .bottom-group a:hover { color:var(--accent); }
     .gear-btn { position:absolute; bottom:10px; right:15px; background:none; border:none; color:var(--text2); font-size:18px; cursor:pointer; }
-    .main { flex:1; display:flex; flex-direction:column; min-width:0; }
-    .topbar { background:var(--sidebar); padding:8px 20px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
-    .right-actions { margin-left:auto; display:flex; gap:8px; align-items:center; }
+
     button, select { padding:6px 14px; background:var(--btn-bg); border:1px solid var(--btn-border); color:var(--text); border-radius:8px; cursor:pointer; font-size:13px; }
     .btn-primary { background:var(--accent)!important; color:#0a0f1a!important; border:none!important; font-weight:bold; }
-    .content { flex:1; overflow-y:auto; padding:20px; }
-    .right-panel { width:280px; background:var(--sidebar); padding:16px; border-left:1px solid var(--border); overflow-y:auto; }
+
     .memory-item { background:var(--card); padding:10px; border-radius:8px; margin-bottom:8px; font-size:13px; display:flex; justify-content:space-between; align-items:center; }
     .memory-item button { padding:2px 8px; font-size:12px; }
 
@@ -62,12 +84,23 @@
     .tool-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
     .tool-links a { background:var(--btn-bg); color:var(--accent); padding:4px 12px; border-radius:20px; text-decoration:none; font-size:12px; border:1px solid var(--btn-border); transition:0.2s; }
     .tool-links a:hover { background:var(--accent); color:#0a0f1a; }
+
+    /* 内部模块自适应 */
+    @media (max-width:900px) {
+      div[style*="display:flex;gap:20px"],
+      div[style*="display:grid"] {
+        flex-direction:column !important;
+        grid-template-columns:1fr !important;
+        gap:12px !important;
+      }
+      textarea, input, select { width:100% !important; }
+    }
   </style>
 </head>
 <body>
 <div class="app">
   <aside class="sidebar" id="sidebar">
-    <div class="logo" id="logoTitle">墨渊·创世工坊 <small>v7.0</small></div>
+    <div class="logo" id="logoTitle">墨渊·创世工坊 <small>v8.0</small></div>
     <nav id="mainNav">
       <a href="#home" class="active">🏠 首页</a>
       <a href="#create">✍️ 创作工坊</a>
@@ -193,7 +226,6 @@ document.addEventListener('DOMContentLoaded', function() {
     showModal('registerModal');
   }
 
-  // 管理员激活
   document.getElementById('logoTitle').addEventListener('click', () => {
     logoClicks++;
     if (logoClicks >= 5) { logoClicks = 0; const pwd = prompt('管理员密码'); if (pwd === 'zfj458888') { loginAs({id:'admin123', name:'墨渊作者', isAdmin:true}); showToast('管理员已登录'); } else showToast('密码错误'); }
@@ -216,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'light') document.body.classList.add('light');
   document.getElementById('themeToggle').addEventListener('click', () => { document.body.classList.toggle('light'); localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark'); });
   document.getElementById('translateBtn').addEventListener('click', () => { if (!curUser) return requireLogin(); const t = prompt('翻译文本：'); if(t) alert(t + ' → translated'); });
-  document.getElementById('updateLogBtn').addEventListener('click', e => { e.preventDefault(); alert('v7.0 增加各板块AI工具链接，变现渠道丰富'); });
+  document.getElementById('updateLogBtn').addEventListener('click', e => { e.preventDefault(); alert('v8.0 优化手机/电脑自适应布局'); });
   document.getElementById('feedbackLink').addEventListener('click', e => { e.preventDefault(); const m = prompt('问题'); if(m) showToast('反馈已提交'); });
   document.getElementById('downloadAppBtn').addEventListener('click', e => { e.preventDefault(); alert('App 开发中'); });
   document.getElementById('chatbotLink').addEventListener('click', e => { e.preventDefault(); showModal('chatbotModal'); });
@@ -235,28 +267,22 @@ document.addEventListener('DOMContentLoaded', function() {
     if (page === 'home') {
       html = `<div class="hero"><h1>一字生万象，一键通寰宇</h1><div class="slogan-carousel"><div class="slogan-item" style="color:#f0c45a;">墨渊·上班族的小金库</div><div class="slogan-item" style="color:#ff6b6b;">墨渊·平凡人圆梦的地方</div><div class="slogan-item" style="color:#4ecdc4;">墨渊·让每一份才华都兑现</div><div class="slogan-item" style="color:#f0c45a;">墨渊·现在注册，开始创作</div></div></div><div class="scene-grid"><div class="scene-card"><div style="font-size:40px;">📖</div><h3>笔下苍穹</h3><p>1.2万追读</p></div><div class="scene-card"><div style="font-size:40px;">🎤</div><h3>原创金曲</h3><p>100万+播放</p></div><div class="scene-card"><div style="font-size:40px;">🎬</div><h3>漫剧大片</h3><p>500万观看</p></div><div class="scene-card"><div style="font-size:40px;">💰</div><h3>喜悦变现</h3><p>¥5,280</p></div></div><div class="cta-wrapper"><button class="cta-btn" id="startCreateBtn">🚀 立即免费开始创作</button></div>`;
     }
-    // 创作工坊
     else if (page === 'create') {
-      html = `<div style="display:flex;gap:20px;height:70vh;"><div style="flex:7;background:var(--card);border-radius:14px;padding:20px;display:flex;flex-direction:column;"><h3>✍️ 创作工坊</h3><div id="chatLog" style="flex:1;overflow-y:auto;margin-bottom:10px;"><div class="chat-bubble bubble-system">输入构思，点击发送。</div></div><div style="display:flex;gap:10px;"><button id="genOutlineBtn" class="btn-primary">📋 生成大纲</button><button id="genFullBtn">⚡ 一键生成全文</button><button id="saveChapterBtn">💾 保存章节</button></div></div><div style="flex:3;background:var(--card);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px;"><div class="preset-row"><select id="genreSel"><option>玄幻修仙</option><option>都市悬疑</option></select><select id="lengthSel"><option>短篇</option><option>长篇</option></select><select id="styleSel"><option>热血</option><option>暗黑</option></select></div><textarea id="userMsgInput" placeholder="输入你的构思..." style="height:150px;"></textarea><div class="word-count" id="createWordCount">字数：0</div><button class="btn-primary" id="sendMsgBtn">发送构思</button><div class="tool-links"><span style="color:var(--text2);font-size:12px;">📚 写作工具：</span><a href="https://chat.openai.com" target="_blank">ChatGPT</a><a href="https://claude.ai" target="_blank">Claude</a><a href="https://yiyan.baidu.com" target="_blank">文心一言</a><a href="https://tongyi.aliyun.com" target="_blank">通义千问</a><a href="https://chatglm.cn" target="_blank">智谱清言</a><a href="https://kimi.moonshot.cn" target="_blank">Kimi</a><a href="https://deepseek.com" target="_blank">DeepSeek</a><a href="https://www.doubao.com" target="_blank">豆包</a><a href="https://www.bailing.com" target="_blank">百川</a><a href="https://www.xiaoyishu.com" target="_blank">秘塔写作猫</a></div></div></div>`;
+      html = `<div style="display:flex;gap:20px;height:70vh;"><div style="flex:7;background:var(--card);border-radius:14px;padding:20px;display:flex;flex-direction:column;"><h3>✍️ 创作工坊</h3><div id="chatLog" style="flex:1;overflow-y:auto;margin-bottom:10px;"><div class="chat-bubble bubble-system">输入构思，点击发送。</div></div><div style="display:flex;gap:10px;"><button id="genOutlineBtn" class="btn-primary">📋 生成大纲</button><button id="genFullBtn">⚡ 一键生成全文</button><button id="saveChapterBtn">💾 保存章节</button></div></div><div style="flex:3;background:var(--card);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px;"><div class="preset-row"><select id="genreSel"><option>玄幻修仙</option><option>都市悬疑</option></select><select id="lengthSel"><option>短篇</option><option>长篇</option></select><select id="styleSel"><option>热血</option><option>暗黑</option></select></div><textarea id="userMsgInput" placeholder="输入你的构思..." style="height:150px;"></textarea><div class="word-count" id="createWordCount">字数：0</div><button class="btn-primary" id="sendMsgBtn">发送构思</button><div class="tool-links"><span style="color:var(--text2);font-size:12px;">📚 写作工具：</span><a href="https://chat.openai.com" target="_blank">ChatGPT</a><a href="https://claude.ai" target="_blank">Claude</a><a href="https://yiyan.baidu.com" target="_blank">文心一言</a><a href="https://tongyi.aliyun.com" target="_blank">通义千问</a><a href="https://chatglm.cn" target="_blank">智谱清言</a><a href="https://kimi.moonshot.cn" target="_blank">Kimi</a><a href="https://deepseek.com" target="_blank">DeepSeek</a><a href="https://www.doubao.com" target="_blank">豆包</a><a href="https://www.bailing.com" target="_blank">百川</a><a href="shturl.cc/GIdkFqPETlCE6zu" target="_blank">秘塔写作猫</a></div></div></div>`;
     }
-    // 二次创作
     else if (page === 'remake') {
       html = `<div style="display:grid;grid-template-columns:1fr 300px;gap:20px;"><div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;"><h3>📄 原文素材</h3><textarea id="remakeInput" placeholder="在此粘贴原文..." style="height:300px;width:100%;"></textarea><div class="word-count" id="remakeInputCount">原文字数：0</div></div><div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;display:flex;flex-direction:column;gap:12px;"><h3>🎨 创作转换</h3><select id="remakeFormat"><option>漫画分镜脚本</option><option>微电影剧本</option><option>短视频解说词</option><option>英文奇幻版</option></select><button id="remakeGenerateBtn" class="btn-primary">⚡ 开始转换</button><button id="remakeSaveBtn">💾 保存结果</button><div id="remakeResult" style="background:var(--bg);padding:12px;border-radius:8px;flex:1;">结果将显示在这里...</div><div class="word-count" id="remakeResultCount">结果字数：0</div><div class="tool-links"><span style="color:var(--text2);font-size:12px;">🔧 改写润色工具：</span><a href="https://quillbot.com" target="_blank">Quillbot</a><a href="https://www.wordtune.com" target="_blank">Wordtune</a><a href="https://www.copy.ai" target="_blank">Copy.ai</a><a href="https://www.jasper.ai" target="_blank">Jasper</a><a href="https://www.yiigle.com" target="_blank">易撰</a><a href="https://www.5118.com" target="_blank">5118</a><a href="https://www.xiaofamao.com" target="_blank">小发猫</a><a href="https://www.shencai.cc" target="_blank">神采AI</a><a href="https://rewritetool.net" target="_blank">RewriteTool</a><a href="https://www.paraphraser.io" target="_blank">Paraphraser</a></div></div></div>`;
     }
-    // 漫剧·微电影
     else if (page === 'video') {
       html = `<div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;"><h2>🎬 漫剧·微电影</h2><div style="display:flex;gap:20px;"><div style="flex:2;"><h4>场景时间线</h4><div id="sceneTimeline" style="display:flex;flex-direction:column;gap:10px;"><div style="display:flex;gap:10px;"><input placeholder="场景1描述" class="scene-desc" style="flex:2;"><input placeholder="镜头" class="scene-cam" style="flex:1;"><select class="scene-mood"><option>紧张</option><option>浪漫</option></select></div></div><button id="addSceneBtn" style="margin-top:10px;">+ 添加场景</button></div><div style="flex:1;display:flex;flex-direction:column;gap:10px;"><button id="videoGenerateBtn" class="btn-primary">🎞️ 生成分镜脚本</button><button id="videoSaveBtn">💾 保存</button><div id="videoResult" style="background:var(--bg);padding:12px;border-radius:8px;"></div><div class="word-count" id="videoWordCount">分镜字数：0</div><div class="tool-links"><span style="color:var(--text2);font-size:12px;">🎥 视频工具：</span><a href="https://runwayml.com" target="_blank">RunwayML</a><a href="https://pika.art" target="_blank">Pika</a><a href="https://www.heygen.com" target="_blank">HeyGen</a><a href="https://www.d-id.com" target="_blank">D-ID</a><a href="https://www.capcut.com" target="_blank">剪映</a><a href="https://www.veed.io" target="_blank">VEED</a><a href="https://www.synthesia.io" target="_blank">Synthesia</a><a href="https://www.pictory.ai" target="_blank">Pictory</a><a href="https://www.kapwing.com" target="_blank">Kapwing</a><a href="https://www.steve.ai" target="_blank">Steve AI</a></div></div></div></div>`;
     }
-    // 墨韵乐章
     else if (page === 'music') {
       html = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;"><div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;"><h3>🎼 创作设置</h3><select id="musicMood"><option>悲伤</option><option>激昂</option><option>浪漫</option></select><div style="margin:12px 0;display:grid;grid-template-columns:repeat(auto-fill, minmax(80px,1fr));gap:8px;" id="musicStyleGrid">${['流行','古风','电子','民谣','爵士','摇滚','古典','民族','轻音乐','R&B'].map(s => `<div class="music-chip-card" data-style="${s}" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;">${s}</div>`).join('')}</div><textarea id="musicDesc" placeholder="描述场景..."></textarea><div class="word-count" id="musicDescCount">字数：0</div><button id="musicGenerateBtn" class="btn-primary">生成配乐</button><button id="musicSaveBtn">保存</button><div class="tool-links"><span style="color:var(--text2);font-size:12px;">🎵 音乐AI：</span><a href="https://suno.ai" target="_blank">Suno</a><a href="https://www.udio.com" target="_blank">Udio</a><a href="https://www.aiva.ai" target="_blank">AIVA</a><a href="https://soundraw.io" target="_blank">Soundraw</a><a href="https://boomy.com" target="_blank">Boomy</a><a href="https://mubert.com" target="_blank">Mubert</a><a href="https://www.riffusion.com" target="_blank">Riffusion</a><a href="https://musicgen.com" target="_blank">MusicGen</a><a href="https://tianyin.163.com" target="_blank">网易天音</a><a href="https://www.yinchong.cn" target="_blank">音虫</a></div></div><div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;"><h3>🎵 生成结果</h3><div id="musicResult" style="background:var(--bg);padding:15px;min-height:200px;"></div></div></div>`;
     }
-    // AI助手
     else if (page === 'aiassistant') {
       const models = ['DeepSeek','豆包','Kimi','ChatGLM','Qwen','文心一言','百川','混元','Gemini','Claude','Mistral','Llama'];
       html = `<div style="display:flex;gap:20px;height:75vh;"><div style="width:180px;border-right:1px solid var(--border);padding-right:12px;"><h3>模型</h3>${models.map(m => `<div class="list-item" data-model="${m}" style="cursor:pointer;padding:8px;margin:4px 0;">${m}</div>`).join('')}</div><div style="flex:1;display:flex;flex-direction:column;"><h3 id="currentModelName">请选择模型</h3><div id="aiChatLog" style="flex:1;background:var(--bg);padding:12px;overflow-y:auto;border-radius:8px;"></div><input id="aiInput" placeholder="输入问题..."><button id="aiSend" class="btn-primary">发送</button><button id="aiSaveBtn">保存对话</button></div></div>`;
     }
-    // 变现通道 (大幅增加平台)
     else if (page === 'monetize') {
       const platforms = [
         '番茄小说','七猫','书旗','起点','晋江','知乎盐选','豆瓣阅读','微信读书',
@@ -266,24 +292,20 @@ document.addEventListener('DOMContentLoaded', function() {
       ];
       html = `<div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;"><h2>💰 创作者变现通道</h2><div style="display:flex;gap:20px;"><div style="flex:2;"><div style="display:flex;gap:8px;margin-bottom:10px;"><button id="selectAll">全选</button><button id="clearAll">清空</button><span>已选 <b id="selectedCount">0</b></span></div><div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(100px,1fr));gap:8px;">${platforms.map(p => `<div class="platform-card" data-platform="${p}">${p}</div>`).join('')}</div></div><div style="flex:1;"><h4>发布操作</h4><div id="selectedPlatformList" style="background:var(--bg);padding:10px;border-radius:8px;min-height:100px;"></div><button id="batchPublish" class="btn-primary" style="width:100%;margin-top:8px;">一键发布</button><button id="monetizeHistoryBtn" style="width:100%;margin-top:8px;">发布历史</button></div></div></div>`;
     }
-    // 技能进化
     else if (page === 'learn') {
       const skills = JSON.parse(localStorage.getItem('skills') || '[{"name":"人物塑造","progress":68,"unlocked":true},{"name":"导演思维","progress":30,"unlocked":true},{"name":"世界观架构","progress":0,"unlocked":false}]');
       const log = JSON.parse(localStorage.getItem('evolutionLog') || '[]');
       html = `<div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;"><h2>📚 技能进化</h2>${skills.map(s => `<div><b>${s.name}</b> ${s.unlocked?'✅':'🔒'}<div class="progress-bar"><div class="progress-fill" style="width:${s.progress}%"></div></div></div>`).join('')}<h4>进化日志</h4><div>${log.slice(0,5).map(l => '<div>'+l+'</div>').join('') || '暂无记录'}</div></div>`;
     }
-    // 全网推广
     else if (page === 'promote') {
       html = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;"><div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;"><h3>📢 推广内容</h3><textarea id="promoteInput" placeholder="作品简介..."></textarea><div class="word-count" id="promoteInputCount">简介字数：0</div><select id="promotePlatform"><option>微博</option><option>小红书</option><option>抖音</option></select><button id="promoteGenerateBtn" class="btn-primary">生成文案</button><div class="tool-links"><span style="color:var(--text2);font-size:12px;">📊 营销工具：</span><a href="https://www.newrank.cn" target="_blank">新榜</a><a href="https://www.weiboyi.com" target="_blank">微小宝</a><a href="https://www.xiguaji.com" target="_blank">西瓜数据</a><a href="https://www.feigua.cn" target="_blank">飞瓜数据</a><a href="https://www.relangyinqing.com" target="_blank">热浪引擎</a><a href="https://www.douchacha.com" target="_blank">抖查查</a><a href="https://www.wenangou.com" target="_blank">文案狗</a><a href="https://www.giiso.com" target="_blank">Giiso</a><a href="https://www.yiigle.com" target="_blank">易撰</a><a href="https://www.5118.com" target="_blank">5118</a></div></div><div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;"><h3>📄 文案预览</h3><div id="promoteResult" style="background:var(--bg);padding:15px;min-height:200px;"></div><div class="word-count" id="promoteResultCount">文案字数：0</div><button id="promoteCopyBtn">复制文案</button><button id="promoteSaveBtn">保存</button></div></div>`;
     }
-    // 作品去AI
     else if (page === 'deai') {
       html = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;"><div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;"><h3>📥 原始文本</h3><textarea id="deaiInput" placeholder="粘贴需要去AI的文本"></textarea><div class="word-count" id="deaiInputCount">字数：0</div><select id="deaiMode"><option>降低AI度</option><option>深度改写</option></select><button id="deaiProcessBtn" class="btn-primary">开始处理</button><div class="tool-links"><span style="color:var(--text2);font-size:12px;">🔍 去AI检测：</span><a href="https://gptzero.me" target="_blank">GPTZero</a><a href="https://copyleaks.com" target="_blank">Copyleaks</a><a href="https://originality.ai" target="_blank">Originality.ai</a><a href="https://sapling.ai" target="_blank">Sapling</a><a href="http://gltr.io" target="_blank">GLTR</a><a href="https://www.zerogpt.com" target="_blank">ZeroGPT</a><a href="https://writer.com" target="_blank">Writer</a><a href="https://contentatscale.ai" target="_blank">Content at Scale</a><a href="https://undetectable.ai" target="_blank">Undetectable</a><a href="https://hivemoderation.com" target="_blank">Hive Moderation</a></div></div><div class="glass-panel" style="background:var(--card);padding:20px;border-radius:14px;"><h3>📤 处理后文本</h3><div id="deaiResult" style="background:var(--bg);padding:15px;min-height:200px;"></div><div class="word-count" id="deaiResultCount">字数：0</div><button id="deaiCopyBtn">复制</button><button id="deaiSaveBtn">保存</button></div></div>`;
     }
 
     mainContent.innerHTML = html;
 
-    // 事件绑定
     if (page === 'home') {
       document.getElementById('startCreateBtn').addEventListener('click', () => { if (!curUser) return requireLogin(); switchPage('create'); });
     }
